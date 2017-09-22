@@ -16,3 +16,12 @@ data_schema = [StructField('age', IntegerType(), True),
 final_struct = StructType(fields=data_schema)
 df = spark.read.json('people.json', schema=final_struct)
 df.printSchema()
+
+print(df['age'])
+print(type(df['age']))
+print(df.select('age'))
+df.select('age').show()
+df.head(2)
+df.select(['age','name']).show()
+
+df.withColumn(('newage'), df['age']).show()
