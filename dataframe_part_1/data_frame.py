@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import findspark
 findspark.init('/home/dienbui/spark-2.2.0-bin-hadoop2.7')
 from pyspark.sql import SparkSession
@@ -22,10 +24,10 @@ print(type(df['age']))
 print(df.select('age'))
 df.select('age').show()
 df.head(2)
-df.select(['age','name']).show()
+df.select(['age', 'name']).show()
 
 df.withColumn(('newage'), df['age']).show()
-df.withColumn('double_age', df['age']*2).show()
+df.withColumn('double_age', df['age'] * 2).show()
 df.createOrReplaceTempView('people')
 results = spark.sql('SELECT * FROM people').show()
 new_result = spark.sql('SELECT * FROM people where age = 30').show()
