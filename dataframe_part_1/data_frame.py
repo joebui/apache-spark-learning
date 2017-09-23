@@ -31,3 +31,13 @@ df.withColumn('double_age', df['age'] * 2).show()
 df.createOrReplaceTempView('people')
 results = spark.sql('SELECT * FROM people').show()
 new_result = spark.sql('SELECT * FROM people where age = 30').show()
+
+# New part
+df = spark.read.csv('appl_stock.csv', inferSchema=True, header=True)
+df.filter('Close < 500').show()
+df.filter('Close < 500').select('Open').show()
+df.filter(df['Close'] < 500).select('Volume').show()
+df.filter((df['Close'] < 200) & (df['Open'] > 200)).show()
+result = df.filter(df['Low'] == 197.16).collect()
+row = result[0]
+row.asDict()
