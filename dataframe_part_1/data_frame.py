@@ -2,7 +2,11 @@ import findspark
 findspark.init('/home/dienbui/spark-2.2.0-bin-hadoop2.7')
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructField, StringType, IntegerType, StructType
-from pyspark.sql.functions import countDistinct, avg, stddev, format_number
+from pyspark.sql.functions import countDistinct, avg, stddev, format_number, mean
+from pyspark.sql.functions import (dayofmonth, dayofyear,
+                                   hour, month,
+                                   year, weekofyear,
+                                   format_number, date_format)
 
 spark = SparkSession.builder.appName('Basics').getOrCreate()
 df = spark.read.json('people.json')
@@ -31,7 +35,8 @@ df.createOrReplaceTempView('people')
 results = spark.sql('SELECT * FROM people').show()
 new_result = spark.sql('SELECT * FROM people where age = 30').show()
 
-# Basic operations
+# BASIC OPERATIONS
+
 df = spark.read.csv('appl_stock.csv', inferSchema=True, header=True)
 df.filter('Close < 500').show()
 df.filter('Close < 500').select('Open').show()
@@ -41,7 +46,8 @@ result = df.filter(df['Low'] == 197.16).collect()
 row = result[0]
 row.asDict()
 
-# GroupBy and aggregate
+# GROUPBY AND AGGREGATE
+
 df.groupBy('Company').mean().show()
 # +-------+-----------------+
 # |Company|       avg(Sales)|
@@ -140,3 +146,28 @@ df.orderBy(df['Sales'].desc()).show()
 # |   MSFT|    Amy|124.0|
 # |   GOOG|Charlie|120.0|
 # +-------+-------+-----+
+
+# MISSING DATA
+
+# Display rows with at least 2 non-null values
+df.na.drop(thresh=2).show()
+# get rows with no null value
+df.na.drop(how='any').show()
+# don't drop any row
+df.na.drop(how='all').show()
+# drop row will null data in Sales
+df.na.drop(subset=['Sales']).show()
+# Fill in any string value
+df.na.fill('FILL VALUE').show()
+# Fill in any null num value
+df.na.fill(0).show()
+# Fill all null in Name column
+df.na.fill('No Name', subset=['Name']).show()
+
+mean_val = df.select(mean(df['Sales'])).collect()
+mean_sales = mean_val[0][0]
+df.na.fill(mean_sales, subset=['Sales']).show()
+
+# TIMESTAMP
+
+df.select(dayofmonth(df['Date'])).show()
